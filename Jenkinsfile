@@ -6,7 +6,7 @@ pipeline {
     agent any
     environment {
         strDockerTag = "${TODAY}_${BUILD_ID}"
-        strDockerImage ="yu3papa/cicd_guestbook:${strDockerTag}"
+        strDockerImage ="anabaral/cicd_guestbook:${strDockerTag}"
     }
 
     stages {
@@ -76,7 +76,7 @@ pipeline {
         stage('Docker Image Push') {
             steps {
                 script {
-                    docker.withRegistry('', 'DockerHub_yu3papa') {
+                    docker.withRegistry('', 'DockerHub_anabaral') {
                         oDockImage.push()
                     }
                 }
@@ -114,7 +114,7 @@ pipeline {
             echo "always."
             /*
             emailext (attachLog: true, body: '본문', compressLog: true
-                    , recipientProviders: [buildUser()], subject: '제목', to: 'yu3papa.j@gmail.com')
+                    , recipientProviders: [buildUser()], subject: '제목', to: 'j@gmail.com')
             */
 
         }
