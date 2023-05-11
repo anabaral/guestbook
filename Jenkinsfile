@@ -101,6 +101,7 @@ pipeline {
         }
         stage ('JMeter LoadTest') {
             steps { 
+                echo "JMeter LoadTest skip"
                 /*
                 sh '~/lab/sw/jmeter/bin/jmeter.sh -j jmeter.save.saveservice.output_format=xml -n -t src/main/jmx/guestbook_loadtest.jmx -l loadtest_result.jtl' 
                 perfReport filterRegex: '', showTrendGraphs: true, sourceDataFiles: 'loadtest_result.jtl' 
@@ -110,6 +111,7 @@ pipeline {
     }
     post { 
         always { 
+            echo "always."
             /*
             emailext (attachLog: true, body: '본문', compressLog: true
                     , recipientProviders: [buildUser()], subject: '제목', to: 'yu3papa.j@gmail.com')
@@ -127,6 +129,6 @@ pipeline {
                 , channel: '#edu'
                 , color: 'danger'
                 , message: "${JOB_NAME} (${BUILD_NUMBER}) 빌드가 실패하였습니다. Details: (<${BUILD_URL} | here >)")
+        }
     }
-  }
 }
