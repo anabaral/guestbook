@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat
 def TODAY = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date())
 
 pipeline {
-    agent any
+    agent { label 'master' }
     environment {
         strDockerTag = "${TODAY}_${BUILD_ID}"
         strDockerImage ="anabaral/cicd_guestbook:${strDockerTag}"
@@ -11,16 +11,19 @@ pipeline {
 
     stages {
         stage('Checkout') {
+            agent { label 'agent1' }
             steps {
                 git branch: 'master', url:'https://github.com/anabaral/guestbook.git'
             }
         }
         stage('Build') {
+            agent { label 'agent1' }
             steps {
                 sh './mvnw clean package'
             }
         }
         stage('Unit Test') {
+            agent { label 'agent1' }
             steps {
                 sh './mvnw test'
             }
@@ -33,6 +36,7 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            agent { label 'agent1' }
             steps{
                 echo 'SonarQube Analysis'
                 /*
@@ -48,6 +52,7 @@ pipeline {
             }
         }
         stage('SonarQube Quality Gate'){
+            agent { label 'agent1' }
             steps{
                 echo 'SonarQube Quality Gate'
                 /*
@@ -66,6 +71,7 @@ pipeline {
             }
         }
         stage('Docker Image Build') {
+            agent { label 'agent2' }
             steps {
                 script {
                     //oDockImage = docker.build(strDockerImage)
@@ -74,6 +80,7 @@ pipeline {
             }
         }
         stage('Docker Image Push') {
+            agent { label 'agent2' }
             steps {
                 script {
                     docker.withRegistry('', 'DockerHub_anabaral') {
@@ -83,6 +90,7 @@ pipeline {
             }
         }
         stage('Staging Deploy') {
+            agent { label 'master' }
             steps {
                 sshagent(credentials: ['Staging-PrivateKey']) {
                     sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.38.68 docker container rm -f guestbookapp"
@@ -100,6 +108,7 @@ pipeline {
             }
         }
         stage ('JMeter LoadTest') {
+            agent { label 'agent1' }
             steps { 
                 echo "JMeter LoadTest skip"
                 /*
